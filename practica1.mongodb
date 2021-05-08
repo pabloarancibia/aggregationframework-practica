@@ -69,6 +69,7 @@ db.facturas.aggregate([
 
 // 6. Basados en la consulta del punto 5 informar solamente la cantidad de clientes que cumplen con esta condición.
 
+// aca falta el FILTRO
 db.facturas.aggregate([
     
     {$group:{
@@ -132,14 +133,18 @@ db.facturas.aggregate([
     {$limit:2}
 ])
 
-// 10. btener todos productos junto con un array de las personas que lo compraron. En este array deberá haber solo strings con el nombre completo de la persona. Los documentos entregados como resultado deberán tener la siguiente forma:
+// 10. obtener todos productos junto con un array de las personas que lo compraron. En este array deberá haber solo strings con el nombre completo de la persona. Los documentos entregados como resultado deberán tener la siguiente forma:
 // {producto: “<nombre>”, personas:[“…”, …]}
 
 db.facturas.aggregate([
     {$unwind:"$item"},
-    {$group:{_id:{  
+    
+    {$group:{_id:0
+
+    }},
+    {
+    $project: {
         producto:"$item.producto"
-        },
-        nombres:{$addToSet:"$item.nombre"}
+        nombre:"$cliente.nombre"
     }}
 ])
