@@ -6,32 +6,42 @@ db.facturas.find()
 
 // 1. Realizar una consulta que devuelva la siguiente información: Región y cantidad total de productos vendidos a clientes de esa Región.
 
-db.facturas.aggregate([{$group: {_id:"$cliente.region", total:{$sum:"item.cantidad"}}}])
+db.facturas.aggregate([
+    {$unwind:"$item"},
+    {$group: {
+        _id:"$cliente.region",
+         total:{$sum:"$item.cantidad"}
+         }
+    }
+])
 
 // 2. Basado en la consulta del punto 1, mostrar sólo la región que tenga el menor ingreso.
 
 db.facturas.aggregate([
+    {$unwind:"$item"},
     {$group: {
         _id:"$cliente.region", 
         total: {$sum:"$item.cantidad"}
     }},
-    {$sort: {total:-1}},
+    {$sort: {total:1}},
     {$limit:1}
 ])
 
 // 3. Basado en la consulta del punto 1, mostrar sólo las regiones que tengan una cantidad de productos vendidos superior a 10000.
 
 db.facturas.aggregate([
+    {$unwind:"$item"},
     {$group: {
         _id:"$cliente.region", 
-        total: {$sum:"$nroFactura"}
+        total: {$sum:"$item.cantidad"}
     }},
-    {$match: {total:{$gt: 287897760}}}
+    {$match: {total:{$gt: 10000}}}
 ])
 
 // 4. Se requiere obtener un reporte que contenga la siguiente información, nro. cuit, apellido y nombre y región y cantidad de facturas, ordenado por apellido.
 
 db.facturas.aggregate([
+    // {$unwind:"$item"},
     {$group:{
         _id:
         {cuit:"$cliente.cuit",
@@ -70,8 +80,7 @@ db.facturas.aggregate([
         _id:0,
         
         total: "$tot"
-        }},
-    //  {$match:{"$cliente.cuit":{$gt:1}}}
+        }}
 ]);
 
 // 7 Se requiere realizar una consulta que devuelva la siguiente información: producto y cantidad de facturas en las que lo compraron, ordenado por cantidad de facturas descendente.
